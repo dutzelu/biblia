@@ -1,0 +1,37 @@
+.chapter-list a {
+  display: inline-block;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: .85em;
+  color: #333;
+  background: aliceblue;
+  border: 1px solid darkblue;
+  padding: 4px 6px;
+  margin: 2px;
+  width: 31px;
+  height: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.book-FullTitle[data-book="5"], .book-FullTitle[data-book="14"], .book-FullTitle[data-book="39"], .book-FullTitle[data-book="80"], .book-FullTitle[data-book="43"] {
+    border-bottom:1px solid #000;
+    margin-bottom:5px;
+    padding-bottom:5px;
+}
+
+    
+.book-FullTitle{cursor:pointer; margin:0; font-size:19px;}
+.book-FullTitle.open{color:#0069d9;}
+.chapter-list{margin:.2rem 0 .6rem 1rem;display:none;flex-wrap:wrap;gap:.2rem;}
+
+.chapter-list a:hover{background:#eee;}
+/* Content */
+a {text-decoration:none;}
+.verse{margin:0 0 .35rem .5rem;text-indent:-.5rem;}
+.v-num{color:#555;font-size:.8em;vertical-align:super;margin-right:.1rem;}
+.xref{color:#0069d9;cursor:pointer;font-size:1em;vertical-align:super; top:0;}
+/* Modal */
+#xrefModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:99;}
+#xrefBox{background:#fff;border-radius:6px;padding:1rem;max-width:600px;margin:5% auto;max-height:85%;overflow:auto;box-shadow:0 4px 15px rgba(0,0,0,.2);}
+#xrefClose{float:right;cursor:pointer;font-weight:bold;font-size:1.2em;}
