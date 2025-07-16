@@ -54,3 +54,96 @@ if ($row = $res->fetch_assoc()) {
     $chapterTitle = $row['Title'];
 }
 $stmt->close();
+
+
+function curata_text($text) {
+    // Elimină atât </br> cât și ^
+    $text = str_replace(['</br>', '^'], '', $text);
+    return $text;
+}
+
+/**
+ * Lista tuturor cărților + nr. de capitole (o singură interogare, cached).
+ * return [ [id, abbr, FullTitle, chapters], ... ]
+ */
+
+function getBooks(mysqli $conn): array {
+    static $books = null;
+    if ($books !== null) return $books;
+    $books = [];
+    $res = $conn->query('SELECT BibPosition, ListTitle, FullTitle, Chapters FROM vbor_structura ORDER BY ID');
+    while ($row = $res->fetch_assoc()) {
+        $books[] = [
+            'id'       => (int)$row['BibPosition'],
+            'abbr'     => $row['ListTitle'],
+            'FullTitle'    => $row['FullTitle'] ?: $row['ListTitle'],
+            'chapters' => (int)$row['Chapters']
+        ];
+    }
+    return $books;
+}
+
+/** Abrevierea cărții – folosită în titluri */
+function getBookAbbrev(mysqli $conn, int $bookId): string {
+    static $map = null;
+    if ($map === null) {
+        $map = [];
+        $res = $conn->query('SELECT BibPosition, ListTitle FROM vbor_structura');
+        while ($row=$res->fetch_assoc()) $map[(int)$row['BibPosition']] = $row['ListTitle'];
+    }
+    return $map[$bookId] ?? (string)$bookId;
+}
+
+/** Randează lista versetelor pentru un CrossReference raw */
+function renderCrossReferenceModal(mysqli $conn, string $raw): string {
+    $targets = parseCrossReference($raw);
+    if (!$targets) return '<p><em>Nu există versete asociate.</em></p>';
+
+    $clauses = []; $params = []; $types = '';
+    foreach($targets as $t){
+        $clauses[] = '(Book=? AND Chapter=? AND Verse=?)';
+        $params[] = $t['book'];
+        $params[] = $t['chapter'];
+        $params[] = $t['verse'];
+        $types .= 'iii';
+    }
+    $sql = 'SELECT Book, Chapter, Verse, Scripture FROM vbor_biblia WHERE ' . implode(' OR ', $clauses) . ' ORDER BY Book, Chapter, Verse';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    $out = '';
+    while ($row = $res->fetch_assoc()) {
+        $bookId = (int)$row['Book'];
+        $cap    = (int)$row['Chapter'];
+        $ver    = (int)$row['Verse'];
+        $text   = curata_text($row['Scripture']);
+        $abbr   = htmlspecialchars(getBookAbbrev($conn, $bookId));
+        $out .= "<div style=\"margin-bottom:1.2em\">";
+        $out .= "<div><strong>$abbr</strong>, <a href=\"?book=$bookId&amp;chapter=$cap\">Cap.$cap</a></div>";
+        $out .= "<div><sup>$ver</sup> $text</div>";
+        $out .= "</div>";
+    }
+
+    return $out;
+}
+
+
+/** Parsează un CrossReference raw; returnează triplete book/chapter/verse */
+function parseCrossReference(string $raw): array {
+    $list = [];
+    foreach (preg_split('/[;)]/', $raw) as $tok) {
+        if (!preg_match('/\{(\d+):(\d+):([\d,\-]+)\}/', $tok, $m)) continue;
+        [$_, $b, $c, $v] = $m;
+        foreach (explode(',', $v) as $chunk) {
+            if (strpos($chunk,'-')!==false) {
+                [$vs,$ve] = array_map('intval', explode('-', $chunk));
+                for($i=$vs;$i<=$ve;$i++) $list[]=['book'=>(int)$b,'chapter'=>(int)$c,'verse'=>$i];
+            } else {
+                $list[]=['book'=>(int)$b,'chapter'=>(int)$c,'verse'=>(int)$chunk];
+            }
+        }
+    }
+    return $list;
+}

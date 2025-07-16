@@ -14,12 +14,41 @@
   font-weight: 600;
 }
 
+.logo {
+  width:200px;
+}
+
+h1 {
+  font-size:26px;
+}
+
+h2 {
+  color: red;
+  font-size:21px;
+}
+
+.sageata-st {
+  margin-right:10px;
+}
+
+.sageata-dr {
+  margin-left:10px;
+}
+
+
+.autor_citat {
+  text-transform:none;
+  font-size:15px;
+  color:red;
+}
+
 .book-FullTitle[data-book="5"], .book-FullTitle[data-book="14"], .book-FullTitle[data-book="39"], .book-FullTitle[data-book="80"], .book-FullTitle[data-book="43"] {
     border-bottom:1px solid #000;
     margin-bottom:5px;
     padding-bottom:5px;
 }
 
+tr.clickable-row { cursor: pointer; }
     
 .book-FullTitle{cursor:pointer; margin:0; font-size:19px;}
 .book-FullTitle.open{color:#0069d9;}
@@ -30,8 +59,16 @@
 a {text-decoration:none;}
 .verse{margin:0 0 .35rem .5rem;text-indent:-.5rem;}
 .v-num{color:#555;font-size:.8em;vertical-align:super;margin-right:.1rem;}
-.xref{color:#0069d9;cursor:pointer;font-size:1em;vertical-align:super; top:0;}
+.xref{color:red;cursor:pointer;font-size:20px;vertical-align:super; top:5px;}
 /* Modal */
 #xrefModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:99;}
 #xrefBox{background:#fff;border-radius:6px;padding:1rem;max-width:600px;margin:5% auto;max-height:85%;overflow:auto;box-shadow:0 4px 15px rgba(0,0,0,.2);}
 #xrefClose{float:right;cursor:pointer;font-weight:bold;font-size:1.2em;}
+
+blockquote  {
+  padding: 10px 0;
+  border-radius: 5px;
+  text-align: left;
+  line-height: 30px;
+  font-style:italic;
+}
